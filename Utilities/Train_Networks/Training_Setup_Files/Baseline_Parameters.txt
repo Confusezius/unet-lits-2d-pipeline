@@ -1,0 +1,80 @@
+%%%%%% This Text-file contains a basic UNet Setup with optional fancy extensions %%%%%
+
+
+
+
+###################################################### Network
+
+%%%% Basic Setup - i.e. basic unet parameters s.a. depth, dropout, initialization or channels. %%%%
+structure:            [3,3,3]
+filter_start:         32
+channels:             3
+init_type:            'he_n'
+use_batchnorm:        True
+dropout:              0.2
+
+%%%% Optional Variations - these are very network-style specific changes, s.a. the usage of auxiliary inputs,
+%%%% convolutional instead of max/avg-pooling, residual/dense connectivity (via backbone), usage of squeeze-and-excitation
+%%%% modules and more.
+use_pypool:           False
+use_auxiliary_inputs: False
+use_conv_pool:        False
+backbone:             'base'
+block_type:           'base'
+up_conv_type:         [4,2,1]
+se_reduction:         0
+
+
+####################################################### Training
+%%%% Main Training Setup Options: 2D or 3D, unet or kunet, liver or lesion data. %%%%
+mode:                 '2D'
+network_type:         'unet'
+data:                 'lesion'
+
+%%%% Basic Training Parameters - s.a. learning rate, kernels, gpu-id, augmentation methods and more. %%%%
+n_epochs:             50
+lr:                   0.00001
+l2_reg:               0.00001
+gpu:                  0
+num_workers:          8
+batch_size:           8
+step_size:            30
+gamma:                0.1
+crop_size:            [256,256]
+perc_data:            1.
+train_val_split:      0.9
+seed:                 1
+loss_func:            'multiclass_pwce'
+class_weights:        [1,1]
+num_classes:          2
+augment:              ['rot', 'zoom','hflip','vflip']
+verbose_idx:          200
+initialization:       ''
+pos_sample_chance:    2
+no_standardize:       False
+%%%% Advanced Training Options - these primarily relate to specifics regarding loss functions.
+%%%% For more details, see the respective loss function class.
+epsilon:               0.000001
+wmap_weight:           2.5
+weight_score:          [1,1]
+focal_gamma:           1.5
+Training_ROI_Vicinity: 4
+
+
+%%%% Specific Save Options - optional flag to add additional information to the save-folder name. %%%%
+savename:             'lesion_baseline_2D'
+
+
+
+
+
+##################################################### Paths
+
+%%%% General Paths - Where the Training data (Input Data, Target Data and Weightmaps) is located,
+%%%% as well as where to save network weights and progression/setup information.
+
+%Training Path contains the path to the Training Data (containing Volumes, LiverMasks, LesionMasks...).
+Training_Path:        'placeholder'
+
+%Save_Path provided a path where training and network parameters are saved to.
+Save_Path:            'placeholder'

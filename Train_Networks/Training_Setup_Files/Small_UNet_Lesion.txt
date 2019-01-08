@@ -1,0 +1,34 @@
+%%% Use this textfile to stack multiple runs with minor changes by setting a certain flag
+%%% to use a list of values. I.e. if you want to test for multiple learning rates, do
+%%% lr: [0.0001, 0.000001, ...].
+%%% '=' or any number of '=' separate a gridsearch/setup.
+%%% Depending on the option you want to change compared to Baseline_Parameters.txt,
+%%% simply declare it in the '='-block.
+
+
+
+============================================================ 2D-UNet LesionSegmentation Baseline: Multiclass PWCE, Complex Structure ============================================================
+###################################### Training
+mode:           ['2D']
+data:           ['lesion']
+network_type:   ['unet']
+
+
+lr:         [0.0001]
+seed:       [1]
+n_epochs:   [10]
+perc_data:  [1]
+step_size:  [6]
+batch_size: [8]
+pos_sample_chance: [2]
+train_val_split: [0.9]
+crop_size:       [[256,256]]
+loss_func:       ['multiclass_dice']
+savename:   ['lesion_with_init_dice_loss']
+no_standardize: [True]
+initialization: ['placeholder/SAVEDATA/Standard_Liver_Networks/vUNet2D_liver_no_equipment']
+
+
+###################################### Paths
+Training_Path:        ['placeholder']
+Save_Path:            ['placeholder']
