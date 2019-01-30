@@ -1,5 +1,6 @@
 # 2D Liver/Lesion Segmentation Pipeline
 ### ___Authors___: [_Karsten Roth_](mailto:karsten.rh1@gmail.com), [_Tomasz Konopczynski_](mailto:Tomasz.Konopczynski@medma.uni-heidelberg.de)
+_karsten.rh1@gmail.com, Tomasz.Konopczynski@medma.uni-heidelberg.de_
 
 ---
 ## Introduction
