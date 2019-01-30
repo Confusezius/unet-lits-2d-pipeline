@@ -7,42 +7,45 @@
 
 
 
-============================================================ 2D-UNet LesionSegmentation Baseline: Multiclass PWCE, Complex Structure ============================================================
+
+============================================================ [1] 2D-UNet LiverSegmentation Baseline: Multiclass PWCE, Complex Structure ============================================================
 ###################################### Training
 mode:           ['2D']
 data:           ['liver']
 network_type:   ['unet']
 
 
-lr:         [0.0001]
-seed:       [1]
-n_epochs:   [55]
-perc_data:  [1]
-step_size:  [35]
-batch_size: [16]
+lr:                [0.00003]
+seed:              [1]
+n_epochs:          [50]
+perc_data:         [1]
+step_size:         [[25,42]]
+gamma:             [0.1]
+batch_size:        [4]
 pos_sample_chance: [2]
-train_val_split: [0.90]
-crop_size:  [[256,256]]
-loss_func: ['multiclass_pwce']
-class_weights: [[1,1]]
-wmap_weight: [3.5]
-no_standardize: [True]
-savename:   ['liver_full_equipment']
-
+train_val_split:   [0.9]
+l2_reg:            [0.00001]
+crop_size:         [[256,256]]
+loss_func:         ['multiclass_pwce']
+class_weights:     [[1,1]]
+wmap_weight:       [3]
+no_standardize:    [True]
+savename:          ['liver_small']
 
 ###################################### Network
 filter_start:         [20]
-filter_start_up:      [8]
-structure:            [[3,3,3,4,5,6]]
-structure_up:         [[2,2,2,2,2,2]]
-block_type:           ['res']
-channels:             [5]
-use_pypool:           [True]
-use_auxiliary_inputs: [True]
+structure:            [[3,3,3,3,3]]
+dropout:              [0]
+block_type:           ['base']
+channels:             [1]
+use_pypool:           [False]
+use_auxiliary_inputs: [False]
 use_conv_pool:        [True]
-backbone:             ['dense_residual']
+backbone:             ['base']
 up_conv_type:         [[4,2,1]]
-se_reduction:         [0.5]
+se_reduction:         [0]
+dilation:             [[1,1,1,1,1]]
+dilation_up:          [[1,1,1,1,1]]
 
 
 
