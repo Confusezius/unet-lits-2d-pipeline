@@ -326,7 +326,7 @@ Using either network, the following results can be achieved using an end-to-end,
 
 Architecture | Test Dice/Case Lesion | Test Dice Global Lesion | Test Dice/Case Liver | Test Dice Global Liver
 -------------|-----------------------|-------------------------|----------------------|-----------------------
-2D Easy UNet |     TBC               |        TBC              |        TBC           |      TBC
+2D Easy UNet |     0.6240            |        0.7930           |        0.9500        |      0.9540
 2D Hard UNet |     TBC               |        TBC              |        TBC           |      TBC
 
 
