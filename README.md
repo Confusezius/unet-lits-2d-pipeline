@@ -25,6 +25,12 @@ _An exemplary architecture sketch_:
 
 To run training on these from scratch, starting at the data download, follow the instructions listed below.
 
+Running the provided pipeline yiels (without ensembling, single 2D-based networks):
+
+Architecture | Test Dice/Case Lesion | Test Dice Global Lesion | Test Dice/Case Liver | Test Dice Global Liver
+-------------|-----------------------|-------------------------|----------------------|-----------------------
+2D Easy UNet |     0.6240            |        0.7930           |        0.9500        |      0.9540
+2D Hard UNet |     0.6540            |        0.7930           |        0.9390        |      0.9510
 
 ---
 
@@ -326,8 +332,8 @@ Using either network, the following results can be achieved using an end-to-end,
 
 Architecture | Test Dice/Case Lesion | Test Dice Global Lesion | Test Dice/Case Liver | Test Dice Global Liver
 -------------|-----------------------|-------------------------|----------------------|-----------------------
-2D Easy UNet |     TBC               |        TBC              |        TBC           |      TBC
-2D Hard UNet |     TBC               |        TBC              |        TBC           |      TBC
+2D Easy UNet |     0.6240            |        0.7930           |        0.9500        |      0.9540
+2D Hard UNet |     0.6540            |        0.7930           |        0.9390        |      0.9510
 
 
 ---

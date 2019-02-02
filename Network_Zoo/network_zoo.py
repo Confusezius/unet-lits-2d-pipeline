@@ -66,6 +66,10 @@ class Scaffold_UNet(nn.Module):
         ####################################### BACKWARD COMPATIBILITY ###############################
         if 'block_type' not in self.pars.Network.keys():
             self.pars.Network['block_type'] = 'base'
+        if 'dilation' not in self.pars.Network.keys():
+            self.pars.Network['dilation'] = [1]*len(self.pars.Network['structure'])
+        if 'dilation_up' not in self.pars.Network.keys():
+            self.pars.Network['dilation_up'] = self.pars.Network['dilation']
 
 
         ############################# [SU] IF NO SPECIFIC DECODING STRUCTURE IS GIVEN, COPY ENCODING ####################
@@ -73,6 +77,7 @@ class Scaffold_UNet(nn.Module):
             self.pars.Network['structure_up']    = self.pars.Network['structure']
         if not 'filter_start_up' in opt.Network.keys():
             self.pars.Network['filter_start_up'] = self.pars.Network['filter_start']
+
 
         ############################# [SU] INITIAL NUMBER OF FILTERS WITHOUT INPUT DISTR. ###############################
         self.pars.Network["filter_sizes"]    = [int(x) for x in self.pars.Network['filter_start']*2**np.array(list(range(0,len(self.pars.Network["structure"])+1)))]
@@ -125,12 +130,12 @@ class Scaffold_UNet(nn.Module):
 
         ####################################### [SU,AU] PROJECTION TO LATENT SPACE ##########################################
         # self.downconv_blocks    = [UNetBaseBlock(self.pars["filter_start"],self.pars["filter_start"], self.pars, 0)]
-        self.downconv_blocks    = [UNetBlockDown(f_in+f_out*stack_info[i]*(i>0),f_out, self.pars, self.pars.Network['structure'][i]) for i,(f_in,f_out) in enumerate(down_filter_arrangements)]
+        self.downconv_blocks    = [UNetBlockDown(f_in+f_out*stack_info[i]*(i>0),f_out, self.pars, self.pars.Network['structure'][i], self.pars.Network['dilation'][i]) for i,(f_in,f_out) in enumerate(down_filter_arrangements)]
         self.downconv_blocks    = nn.ModuleList(self.downconv_blocks)
 
 
         ####################################### [SU] RECONSTRUCTION FROM LATENT SPACE #####################################
-        self.upconv_blocks      = [UNetBlockUp(f_t_in, f_in, f_out, self.pars, self.pars.Network['structure_up'][-(i+1)]) for i,((_,f_t_in),(f_in,f_out)) in enumerate(zip(down_filter_arrangements[::-1][1:],up_filter_arrangements))]
+        self.upconv_blocks      = [UNetBlockUp(f_t_in, f_in, f_out, self.pars, self.pars.Network['structure_up'][-(i+1)], self.pars.Network['dilation_up'][-(i+1)]) for i,((_,f_t_in),(f_in,f_out)) in enumerate(zip(down_filter_arrangements[::-1][1:],up_filter_arrangements))]
         self.upconv_blocks      = nn.ModuleList(self.upconv_blocks)
 
 
@@ -228,13 +233,13 @@ class Scaffold_UNet(nn.Module):
 """======================================================"""
 ### Basic ResnetBlock
 class ResBlock(nn.Module):
-    def __init__(self, filters_in, filters_out, pars, reduce=4):
+    def __init__(self, filters_in, filters_out, pars, dilate_val, reduce=4):
         super(ResBlock, self).__init__()
         self.pars = pars
         self.net = nn.Sequential(self.pars.fset.conv(filters_in, filters_in//reduce, 1, 1, 0),
                                  self.pars.fset.norm(filters_in//reduce) if self.pars.Network['use_batchnorm'] else self.pars.fset.norm(filters_in//reduce//4, filters_in//reduce),
                                  nn.LeakyReLU(0.05),
-                                 self.pars.fset.conv(filters_in//reduce, filters_in//reduce, 3, 1, 1),
+                                 self.pars.fset.conv(filters_in//reduce, filters_in//reduce, 3, 1, dilate_val, dilation=dilate_val),
                                  self.pars.fset.norm(filters_in//reduce) if self.pars.Network['use_batchnorm'] else self.pars.fset.norm(filters_in//reduce//4, filters_in//reduce),
                                  nn.LeakyReLU(0.05),
                                  self.pars.fset.conv(filters_in//reduce, filters_out, 1, 1, 0))
@@ -245,11 +250,11 @@ class ResBlock(nn.Module):
 
 ### Basic ResNeXtBlock
 class ResXBlock(nn.Module):
-    def __init__(self, filters_in, filters_out, pars):
+    def __init__(self, filters_in, filters_out, dilate_val, pars):
         super(ResXBlock, self).__init__()
         self.pars = pars
         group_reduce, cardinality = filters_in//8, np.clip(filters_in//8,None,32).astype(int)
-        self.blocks = nn.ModuleList([ResBlock(filters_in, filters_out, self.pars, reduce=group_reduce) for _ in range(cardinality)])
+        self.blocks = nn.ModuleList([ResBlock(filters_in, filters_out, self.pars, dilate_val, reduce=group_reduce) for _ in range(cardinality)])
 
     def forward(self,x):
         for i,block in enumerate(self.blocks):
@@ -262,7 +267,7 @@ class ResXBlock(nn.Module):
 
 ### Basic Encoding Block
 class UNetBlockDown(nn.Module):
-    def __init__(self, filters_in, filters_out, pars, reps):
+    def __init__(self, filters_in, filters_out, pars, reps, dilate_val):
         super(UNetBlockDown, self).__init__()
         self.pars  = pars
 
@@ -277,11 +282,11 @@ class UNetBlockDown(nn.Module):
             f_in = filters_in if i==0 else filters_out
 
             if self.pars.Network['block_type']=='res':
-                self.convs.append(ResBlock(f_in, filters_out, self.pars))
+                self.convs.append(ResBlock(f_in, filters_out, self.pars, dilate_val))
             elif self.pars.Network['block_type']=='resX':
-                self.convs.append(ResXBlock(f_in, filters_out, self.pars))
+                self.convs.append(ResXBlock(f_in, filters_out, self.pars, dilate_val))
             else:
-                self.convs.append(self.pars.fset.conv(f_in, filters_out, 3, 1, 1))
+                self.convs.append(self.pars.fset.conv(f_in, filters_out, 3, 1, dilate_val, dilation = dilate_val))
 
 
             if self.pars.Network['use_batchnorm']:
@@ -362,7 +367,7 @@ class UNetBlockDown(nn.Module):
 """======================================================"""
 ### Horizontal UNet Block - Up
 class UNetBlockUp(nn.Module):
-    def __init__(self, filters_t_in, filters_in, filters_out, pars, reps):
+    def __init__(self, filters_t_in, filters_in, filters_out, pars, reps, dilate_val):
         super(UNetBlockUp, self).__init__()
 
         self.pars       = pars
@@ -378,11 +383,11 @@ class UNetBlockUp(nn.Module):
             f_in = filters_out+filters_t_in if i==0 else filters_out
 
             if self.pars.Network['block_type']=='res':
-                self.convs.append(ResBlock(f_in, filters_out, self.pars))
+                self.convs.append(ResBlock(f_in, filters_out, self.pars, dilate_val))
             elif self.pars.Network['block_type']=='resX':
-                self.convs.append(ResXBlock(f_in, filters_out, self.pars))
+                self.convs.append(ResXBlock(f_in, filters_out, self.pars, dilate_val))
             else:
-                self.convs.append(self.pars.fset.conv(f_in, filters_out, 3, 1, 1))
+                self.convs.append(self.pars.fset.conv(f_in, filters_out, 3, 1, dilate_val, dilation = dilate_val))
 
 
             if self.pars.Network['use_batchnorm']:

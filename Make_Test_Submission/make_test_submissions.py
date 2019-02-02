@@ -6,7 +6,8 @@
 """======================================="""
 import torch.utils.data as data
 class TestDataset(data.Dataset):
-    def __init__(self, test_data_folder, path_2_liver_segmentations, channel_size=1):
+    def __init__(self, test_data_folder, path_2_liver_segmentations, opt, channel_size=1):
+        self.pars = opt
         self.test_volumes       = [x for x in os.listdir(test_data_folder+'/Volumes')]
         self.test_volume_slices = {key:[test_data_folder+'/Volumes/'+key+'/'+x for x in sorted(os.listdir(test_data_folder+'/Volumes/'+key),key=lambda x: [int(y) for y in x.split('-')[-1].split('.')[0].split('_')])] for key in self.test_volumes}
         self.test_liver_slices  = {key:[path_2_liver_segmentations+'/'+key+'/'+x for x in sorted(os.listdir(path_2_liver_segmentations+'/'+key),key=lambda x: [int(y) for y in x.split('-')[-1].split('.')[0].split('_')])] for key in self.test_volumes}
@@ -59,7 +60,11 @@ class TestDataset(data.Dataset):
     def __getitem__(self, idx):
         VOI, SOI = self.iter_data[idx]
         V2O  = np.concatenate([np.expand_dims(np.load(vol),0) for vol in self.test_volume_slices[VOI][SOI]],axis=0)
-        V2O  = gu.normalize(V2O, supply_mode="orig")
+
+        if self.pars.Training['no_standardize']:
+            V2O  = gu.normalize(V2O, zero_center=False, unit_variance=False, supply_mode="orig")
+        else:
+            V2O  = gu.normalize(V2O)
 
         LMSK  = np.concatenate([np.expand_dims(np.load(vol),0) for vol in self.test_liver_slices[VOI][SOI]],axis=0)
 
@@ -104,7 +109,7 @@ def main(opt):
 
     ############# Set Dataloader ##################
     max_channels    = np.max([item['settings'].Network['channels'] for item in network_list])
-    test_dataset    = TestDataset(opt.test_data, opt.path_2_liv_seg, channel_size=max_channels)
+    test_dataset    = TestDataset(opt.test_data, opt.path_2_liv_seg, network_list[0]['settings'], channel_size=max_channels)
     test_dataloader = torch.utils.data.DataLoader(test_dataset, num_workers=0, batch_size=1, shuffle=False)
 
     input_slices, vol_segs, volume_info, liver_masks= [],[],{},[]

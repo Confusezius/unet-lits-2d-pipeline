@@ -7,7 +7,8 @@
 
 
 
-============================================================ [3] 2D-UNet LesionSegmentation Baseline: Multiclass PWCE and Dice Combined, Complex Structure ============================================================
+
+============================================================ [5] 2D-UNet LesionSegmentation Baseline: Multiclass PWCE, Complex Structure ============================================================
 ###################################### Training
 mode:           ['2D']
 data:           ['lesion']
@@ -19,18 +20,18 @@ seed:              [1]
 n_epochs:          [55]
 perc_data:         [1]
 step_size:         [[45]]
-gamma:             [0.1]
+gamma:             [0.2]
 batch_size:        [4]
 pos_sample_chance: [2]
 train_val_split:   [0.9]
+l2_reg:            [0.0001]
 crop_size:         [[288,288]]
 loss_func:         ['multiclass_combined']
-l2_reg:            [0.00004]
 class_weights:     [[1,1]]
 wmap_weight:       [3]
 no_standardize:    [True]
-savename:          ['lesion_big']
-initialization:    ['placeholder/SAVEDATA/Standard_Liver_Networks/vUnet_liver_big']
+savename:          ['lesion_medium']
+initialization:    ['placeholder/SAVEDATA/Standard_Liver_Networks/vUnet2D_liver_medium']
 
 
 ###################################### Paths
