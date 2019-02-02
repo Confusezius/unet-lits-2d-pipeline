@@ -1,0 +1,54 @@
+%%% Use this textfile to stack multiple runs with minor changes by setting a certain flag
+%%% to use a list of values. I.e. if you want to test for multiple learning rates, do
+%%% lr: [0.0001, 0.000001, ...].
+%%% '=' or any number of '=' separate a gridsearch/setup.
+%%% Depending on the option you want to change compared to Baseline_Parameters.txt,
+%%% simply declare it in the '='-block.
+
+
+
+
+============================================================ [1] 2D-UNet LiverSegmentation Baseline: Multiclass PWCE, Complex Structure ============================================================
+###################################### Training
+mode:           ['2D']
+data:           ['liver']
+network_type:   ['unet']
+
+
+lr:                [0.00003]
+seed:              [1]
+n_epochs:          [50]
+perc_data:         [1]
+step_size:         [[25,42]]
+gamma:             [0.1]
+batch_size:        [4]
+pos_sample_chance: [2]
+train_val_split:   [0.9]
+l2_reg:            [0.00001]
+crop_size:         [[256,256]]
+loss_func:         ['multiclass_pwce']
+class_weights:     [[1,1]]
+wmap_weight:       [3]
+no_standardize:    [True]
+savename:          ['liver_small']
+
+###################################### Network
+filter_start:         [20]
+structure:            [[3,3,3,3,3]]
+dropout:              [0]
+block_type:           ['base']
+channels:             [1]
+use_pypool:           [False]
+use_auxiliary_inputs: [False]
+use_conv_pool:        [True]
+backbone:             ['base']
+up_conv_type:         [[4,2,1]]
+se_reduction:         [0]
+dilation:             [[1,1,1,1,1]]
+dilation_up:          [[1,1,1,1,1]]
+
+
+
+###################################### Paths
+Training_Path:        ['placeholder']
+Save_Path:            ['placeholder']

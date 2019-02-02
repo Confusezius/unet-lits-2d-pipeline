@@ -1,0 +1,10 @@
+matplotlib
+joblib
+scipy
+scikit-learn
+scikit-image
+tqdm
+pandas
+nibabel -c conda-forge
+pytorch=0.4.1 cuda80 -c pytorch
+torchvision=0.2.1 -c pytorch
