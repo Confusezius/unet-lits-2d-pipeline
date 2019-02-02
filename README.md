@@ -185,11 +185,11 @@ ___NOTE:___ _The setup shown uses a single network for Test-Set Segmentation. If
 
 _For the small UNet:_
 ```
-python Make_Test_Submission/generate_liver_masks.py --network_choice vUnet2D_liver_no_equipment
+python Make_Test_Submission/generate_liver_masks.py --network_choice vUnet2D_liver_small
 ```
 _For the big UNet:_
 ```
-python Make_Test_Submission/generate_liver_masks.py --network_choice vUnet2D_liver_full_equipment
+python Make_Test_Submission/generate_liver_masks.py --network_choice vUnet2D_liver_big
 ```
 
 #### (V.) __Generate Lesion Masks and Submission Files__:
@@ -197,11 +197,11 @@ ___NOTE:___ _The setup shown uses a single network for Test-Set Segmentation. If
 
 _For the small UNet:_
 ```
-python Make_Test_Submission/make_test_submission.py --network_choice vUnet2D_lesion_2d_unet_easy_baseline
+python Make_Test_Submission/make_test_submission.py --network_choice vUnet2D_lesion_small
 ```
 _For the big UNet:_
 ```
-python Make_Test_Submission/make_test_submission.py --network_choice vUnet2D_lesion_2d_unet_hard_baseline
+python Make_Test_Submission/make_test_submission.py --network_choice vUnet2D_lesion_big
 ```
 
 
